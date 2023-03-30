@@ -59,6 +59,13 @@ namespace SMBLibrary.Win32.Security
         public static byte[] GetType1Message(string domainName, string userName, string password, out SecHandle clientContext)
         {
             SecHandle credentialsHandle = AcquireNTLMCredentialsHandle(domainName, userName, password);
+            return GetType1Message(out clientContext, credentialsHandle);
+        }
+
+        public static byte[] GetType1Message(out SecHandle clientContext
+            , SecHandle credentialsHandle
+        )
+        {
             clientContext = new SecHandle();
             SecBuffer outputBuffer = new SecBuffer(MAX_TOKEN_SIZE);
             SecBufferDesc output = new SecBufferDesc(outputBuffer);

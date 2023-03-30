@@ -209,12 +209,18 @@ namespace SMBLibrary.Client
 
         public NTStatus Login(string domainName, string userName, string password, AuthenticationMethod authenticationMethod)
         {
+            return Login(new UserProvidedNtlmAuthenticationHelper(domainName, userName, password), authenticationMethod);
+        }
+         
+        public NTStatus Login(INtlmAuthenticationHelper ntlmAuthenticationHelper, AuthenticationMethod authenticationMethod)
+        {
             if (!m_isConnected)
             {
                 throw new InvalidOperationException("A connection must be successfully established before attempting login");
             }
 
-            byte[] negotiateMessage = NTLMAuthenticationHelper.GetNegotiateMessage(m_securityBlob, domainName, authenticationMethod);
+            string spn = string.Format("cifs/{0}", m_serverName);
+            byte[] negotiateMessage = ntlmAuthenticationHelper.GetNegotiateMessage(m_securityBlob, spn, authenticationMethod);
             if (negotiateMessage == null)
             {
                 return NTStatus.SEC_E_INVALID_TOKEN;
@@ -229,8 +235,7 @@ namespace SMBLibrary.Client
             {
                 if (response.Header.Status == NTStatus.STATUS_MORE_PROCESSING_REQUIRED && response is SessionSetupResponse)
                 {
-                    string spn = string.Format("cifs/{0}", m_serverName);
-                    byte[] authenticateMessage = NTLMAuthenticationHelper.GetAuthenticateMessage(((SessionSetupResponse)response).SecurityBuffer, domainName, userName, password, spn, authenticationMethod, out m_sessionKey);
+                    byte[] authenticateMessage = ntlmAuthenticationHelper.GetAuthenticateMessage(((SessionSetupResponse)response).SecurityBuffer, spn, authenticationMethod, out m_sessionKey);
                     if (authenticateMessage == null)
                     {
                         return NTStatus.SEC_E_INVALID_TOKEN;
