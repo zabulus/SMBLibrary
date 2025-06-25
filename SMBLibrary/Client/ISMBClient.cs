@@ -42,5 +42,7 @@ namespace SMBLibrary.Client
         {
             get;
         }
+
+        NTStatus Echo();
     }
 }
