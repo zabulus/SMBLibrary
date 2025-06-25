@@ -721,6 +721,19 @@ namespace SMBLibrary.Client
             }
         }
 
+        public NTStatus Echo()
+        {
+            var request = new EchoRequest();
+            TrySendCommand(request);
+            var response = WaitForCommand(request.MessageID);
+            if (response != null)
+            {
+                return response.Header.Status;
+            }
+            
+            return NTStatus.STATUS_INVALID_SMB;
+        }
+
         private void TrySendCommand(Socket socket, SMB2Command request, byte[] encryptionKey)
         {
             SessionMessagePacket packet = new SessionMessagePacket();
