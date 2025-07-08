@@ -13,7 +13,7 @@ namespace SMBLibrary.SMB2
     /// <summary>
     /// SMB2 IOCTL Request
     /// </summary>
-    public class IOCtlResponse : SMB2Command
+    public class IOCtlResponse : SMB2Command, IHasFileId
     {
         public const int FixedLength = 48;
         public const int DeclaredSize = 49;
@@ -21,7 +21,7 @@ namespace SMBLibrary.SMB2
         private ushort StructureSize;
         public ushort Reserved;
         public uint CtlCode;
-        public FileID FileId;
+        public FileID FileId { get; set; }
         private uint InputOffset;
         private uint InputCount;
         private uint OutputOffset;

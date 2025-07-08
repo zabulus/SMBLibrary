@@ -13,7 +13,7 @@ namespace SMBLibrary.SMB2
     /// <summary>
     /// SMB2 QUERY_INFO Request
     /// </summary>
-    public class QueryInfoRequest : SMB2Command
+    public class QueryInfoRequest : SMB2Command, IHasFileId
     {
         public const int FixedSize = 40;
         public const int DeclaredSize = 41;
@@ -27,7 +27,7 @@ namespace SMBLibrary.SMB2
         private uint InputBufferLength;
         public uint AdditionalInformation;
         public uint Flags;
-        public FileID FileId;
+        public FileID FileId { get; set; }
         public byte[] InputBuffer = new byte[0];
 
         public QueryInfoRequest() : base(SMB2CommandName.QueryInfo)

@@ -11,7 +11,7 @@ using Utilities;
 
 namespace SMBLibrary.Client
 {
-    public class SMB2FileStore : ISMBFileStore
+    public class SMB2FileStore : ISMBCompoundFileStore
     {
         private const int BytesPerCredit = 65536;
 
@@ -360,6 +360,37 @@ namespace SMBLibrary.Client
             {
                 return m_client.MaxWriteSize;
             }
+        }
+
+        public NTStatus BatchDeleteFiles(IList<string> filePaths, out IList<BatchOperationResult> results)
+        {
+            var commands = new List<SMB2Command>();
+    
+            foreach (var filePath in filePaths)
+            {
+                commands.Add(new CreateRequest 
+                { 
+                    Name = filePath,
+                    DesiredAccess = AccessMask.DELETE,
+                    CreateDisposition = CreateDisposition.FILE_OPEN,
+                    CreateOptions = CreateOptions.FILE_DELETE_ON_CLOSE
+                });
+        
+                commands.Add(new CloseRequest());
+            }
+    
+            var messageID = m_client.m_messageID;
+            var request = m_client.BuildCompoundRequest(commands, relatedOperations: true, m_treeID);
+            this.TrySendCommand(request);
+            SMB2Command response = m_client.WaitForCommand(messageID, out bool connectionTerminated);
+            if (response != null)
+            {
+                results = new List<BatchOperationResult>();
+                return response.Header.Status;
+            }
+
+            results = new List<BatchOperationResult>();
+            return connectionTerminated ? NTStatus.STATUS_INVALID_SMB : NTStatus.STATUS_IO_TIMEOUT;
         }
 
         private static FileStatus ToFileStatus(CreateAction createAction)

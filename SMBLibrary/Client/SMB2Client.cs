@@ -43,7 +43,7 @@ namespace SMBLibrary.Client
         private SessionPacket m_sessionResponsePacket;
         private EventWaitHandle m_sessionResponseEventHandle = new EventWaitHandle(false, EventResetMode.AutoReset);
 
-        private uint m_messageID = 0;
+        internal uint m_messageID = 0;
         private SMB2Dialect m_dialect;
         private bool m_signingRequired;
         private byte[] m_signingKey;
@@ -768,6 +768,25 @@ namespace SMBLibrary.Client
             {
                 m_isConnected = false;
             }
+        }
+
+        internal SMB2Command BuildCompoundRequest(IList<SMB2Command> commands, bool relatedOperations, uint mTreeId)
+        {
+            if (commands == null || commands.Count == 0)
+                throw new ArgumentException("At least one command is required");
+
+            if (commands.Count == 1)
+                return commands[0]; // No need to compound single command
+
+            // Use CompoundSmb2Command for compound requests
+            foreach (var command in commands)
+            {
+                command.Header.MessageID = m_messageID++;
+                command.Header.SessionID = m_sessionID;
+                command.Header.TreeID = mTreeId;
+            }
+            
+            return new SMBLibrary.SMB2.Commands.CompoundSmb2Command(commands, relatedOperations);
         }
     }
 }

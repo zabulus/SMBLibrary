@@ -26,7 +26,7 @@ namespace SMBLibrary.SMB2
             Header = new SMB2Header(buffer, offset);
         }
 
-        public void WriteBytes(byte[] buffer, int offset)
+        public virtual void WriteBytes(byte[] buffer, int offset)
         {
             Header.WriteBytes(buffer, offset);
             WriteCommandBytes(buffer, offset + SMB2Header.Length);

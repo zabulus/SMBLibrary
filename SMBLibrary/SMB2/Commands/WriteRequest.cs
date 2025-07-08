@@ -13,7 +13,7 @@ namespace SMBLibrary.SMB2
     /// <summary>
     /// SMB2 WRITE Request
     /// </summary>
-    public class WriteRequest : SMB2Command
+    public class WriteRequest : SMB2Command, IHasFileId
     {
         public const int FixedSize = 48;
         public const int DeclaredSize = 49;
@@ -22,7 +22,7 @@ namespace SMBLibrary.SMB2
         private ushort DataOffset;
         private uint DataLength;
         public ulong Offset;
-        public FileID FileId;
+        public FileID FileId { get; set; }
         public uint Channel;
         public uint RemainingBytes;
         private ushort WriteChannelInfoOffset;

@@ -25,6 +25,12 @@ namespace SMBLibrary.SMB2
             Volatile = LittleEndianConverter.ToUInt64(buffer, offset + 8);
         }
 
+        public FileID(ulong persistent, ulong @volatile)
+        {
+            Persistent = persistent;
+            Volatile = @volatile;
+        }
+
         public void WriteBytes(byte[] buffer, int offset)
         {
             LittleEndianWriter.WriteUInt64(buffer, offset + 0, Persistent);

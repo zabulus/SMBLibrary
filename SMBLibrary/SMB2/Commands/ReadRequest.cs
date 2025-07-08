@@ -13,7 +13,7 @@ namespace SMBLibrary.SMB2
     /// <summary>
     /// SMB2 READ Request
     /// </summary>
-    public class ReadRequest : SMB2Command
+    public class ReadRequest : SMB2Command, IHasFileId
     {
         public const int FixedSize = 48;
         public const int DeclaredSize = 49;
@@ -23,7 +23,7 @@ namespace SMBLibrary.SMB2
         public ReadFlags Flags;
         public uint ReadLength;
         public ulong Offset;
-        public FileID FileId;
+        public FileID FileId { get; set; }
         public uint MinimumCount;
         public uint Channel;
         public uint RemainingBytes;

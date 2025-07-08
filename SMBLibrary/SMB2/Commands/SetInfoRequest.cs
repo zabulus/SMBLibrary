@@ -13,7 +13,7 @@ namespace SMBLibrary.SMB2
     /// <summary>
     /// SMB2 SET_INFO Request
     /// </summary>
-    public class SetInfoRequest : SMB2Command
+    public class SetInfoRequest : SMB2Command, IHasFileId
     {
         public const int FixedSize = 32;
         public const int DeclaredSize = 33;
@@ -25,7 +25,7 @@ namespace SMBLibrary.SMB2
         private ushort BufferOffset;
         public ushort Reserved;
         public uint AdditionalInformation;
-        public FileID FileId;
+        public FileID FileId { get; set; }
         public byte[] Buffer = new byte[0];
 
         public SetInfoRequest() : base(SMB2CommandName.SetInfo)

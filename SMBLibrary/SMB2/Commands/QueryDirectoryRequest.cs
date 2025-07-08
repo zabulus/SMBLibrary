@@ -13,7 +13,7 @@ namespace SMBLibrary.SMB2
     /// <summary>
     /// SMB2 QUERY_DIRECTORY Request
     /// </summary>
-    public class QueryDirectoryRequest : SMB2Command
+    public class QueryDirectoryRequest : SMB2Command, IHasFileId
     {
         public const int FixedLength = 32;
         public const int DeclaredSize = 33;
@@ -22,7 +22,7 @@ namespace SMBLibrary.SMB2
         public FileInformationClass FileInformationClass;
         public QueryDirectoryFlags Flags;
         public uint FileIndex;
-        public FileID FileId;
+        public FileID FileId { get; set; }
         private ushort FileNameOffset;
         private ushort FileNameLength;
         public uint OutputBufferLength;

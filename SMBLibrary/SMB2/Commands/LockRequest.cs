@@ -13,7 +13,7 @@ namespace SMBLibrary.SMB2
     /// <summary>
     /// SMB2 LOCK Request
     /// </summary>
-    public class LockRequest : SMB2Command
+    public class LockRequest : SMB2Command, IHasFileId
     {
         public const int DeclaredSize = 48;
 
@@ -21,7 +21,7 @@ namespace SMBLibrary.SMB2
         // ushort LockCount;
         public byte LSN; // 4 bits
         public uint LockSequenceIndex; // 28 bits
-        public FileID FileId;
+        public FileID FileId { get; set; }
         public List<LockElement> Locks;
 
         public LockRequest() : base(SMB2CommandName.Lock)
