@@ -10,23 +10,20 @@ using SMBLibrary.NetBios;
 
 namespace SMBLibrary.Client
 {
-    public class ConnectionState
+    public sealed class ConnectionState : IDisposable
     {
-        private Socket m_clientSocket;
+        private readonly EventHandler<SocketAsyncEventArgs> m_completed;
         private NBTConnectionReceiveBuffer m_receiveBuffer;
+        private readonly SocketAsyncEventArgs m_receiveArgs;
 
-        public ConnectionState(Socket clientSocket)
+        public ConnectionState(EventHandler<SocketAsyncEventArgs> mCompleted)
         {
-            m_clientSocket = clientSocket;
+            m_completed = mCompleted;
             m_receiveBuffer = new NBTConnectionReceiveBuffer();
-        }
-
-        public Socket ClientSocket
-        {
-            get
-            {
-                return m_clientSocket;
-            }
+            m_receiveArgs = new SocketAsyncEventArgs();
+            m_receiveArgs.SetBuffer(m_receiveBuffer.Buffer, m_receiveBuffer.WriteOffset, m_receiveBuffer.AvailableLength);
+            m_receiveArgs.UserToken = this;
+            m_receiveArgs.Completed += mCompleted;
         }
 
         public NBTConnectionReceiveBuffer ReceiveBuffer
@@ -35,6 +32,21 @@ namespace SMBLibrary.Client
             {
                 return m_receiveBuffer;
             }
+        }
+
+        public SocketAsyncEventArgs Args => m_receiveArgs;
+
+        public void IncreaseBufferSize(int maxPacketSize)
+        {
+            m_receiveBuffer.IncreaseBufferSize(maxPacketSize);
+            m_receiveArgs.SetBuffer(m_receiveBuffer.Buffer, m_receiveBuffer.WriteOffset, m_receiveBuffer.AvailableLength);
+        }
+
+        public void Dispose()
+        {
+            m_receiveArgs.Completed -= m_completed;
+            m_receiveArgs.Dispose();
+            m_receiveBuffer.Dispose();
         }
     }
 }
